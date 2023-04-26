@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.qinchy</groupId>
+        <groupId>com.qinchy</groupId>
         <artifactId>operator-gateway</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
@@ -54,10 +54,44 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15to18</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.zhy</groupId>
+            <artifactId>okhttputils</artifactId>
+            <version>2.6.2</version>
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${project.basedir}/libs/okhttputils-2_6_2.jar</systemPath>-->
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    <execution>
+                        <id>install-okhttputils</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <file>${project.basedir}/libs/okhttputils-2_6_2.jar</file>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>com.zhy</groupId>
+                            <artifactId>okhttputils</artifactId>
+                            <version>2.6.2</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

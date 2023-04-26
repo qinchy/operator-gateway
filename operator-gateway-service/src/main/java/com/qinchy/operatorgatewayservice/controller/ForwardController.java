@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 @RestController
 @Slf4j
 public class ForwardController {
@@ -51,13 +52,13 @@ public class ForwardController {
             throw new RuntimeException("报文中的接收方为空");
         }
         String host = operatorConfig.getOperatorConfig().get(receiver).get("host");
+        log.info("获取到 {} 的主机地址为：{}", receiver, host);
 
         // 将转发的JSON模板转换成文档上下文对象，后面对此对象进行操作。
         DocumentContext documentContext = JsonPath.parse(forwardJsonTemplate);
         log.info("转发的JSON文档为：{}", documentContext.jsonString());
         EvaluationContext evaluationContext = getEvaluationContext(request);
-        Map result = buildSendMessage(documentContext, evaluationContext);
-
+        Map<String,Object> result = buildSendMessage(documentContext, evaluationContext);
 
         // 构造返回对象
         Response.ResponseBuilder<Map<String, Object>> builder = Response.builder();
@@ -102,7 +103,7 @@ public class ForwardController {
      * @param documentContext   模板上下文
      * @param evaluationContext 变量上下文
      * @return 发送给运营商的请求内容
-     * @throws Exception
+     * @throws Exception 抛出异常
      */
     private Map buildSendMessage(DocumentContext documentContext, EvaluationContext evaluationContext) throws Exception {
         JSONArray jsonArray = JSON.parseArray(handlerExpress);
