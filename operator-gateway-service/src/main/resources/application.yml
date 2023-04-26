@@ -1,0 +1,72 @@
+config:
+  operatorconfig:
+    cmcc:
+      host: 127.0.0.1:8080
+      clientid: cmccclientid
+    ctcc:
+      host: 127.0.0.1:8080
+      clientid: ctccclientid
+    cucc:
+      host: 127.0.0.1:8080
+      clientid: cuccclientid
+
+forward-json-template: |
+  {
+    "msg_header": {
+      "version": "01",
+      "sender_date_time": "",
+      "message_sn": "",
+      "client_id": "",
+      "signature_sn": "",
+      "encryption_sn": "",
+      "digital_envelope": "",
+      "iv": ""
+    },
+    "msg_body": {
+      "req": ""
+    }
+  }
+
+handler-expression: |
+  [
+    {
+      "action": "modify",
+      "jsonpath": "$.msg_header.sender_date_time",
+      "value": "#senderDateTime"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msg_header.message_sn",
+      "value": "#messageSn"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msg_header.client_id",
+      "value": "#clientId"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msg_header.signature_sn",
+      "value": "#signatureSn"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msg_header.encryption_sn",
+      "value": "#encryptionSn"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msg_header.digital_envelope",
+      "value": "#digitalEnvelope"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msg_header.iv",
+      "value": "#iv"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msg_body.req",
+      "value": "#request"
+    }
+  ]
