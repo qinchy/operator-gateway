@@ -11,9 +11,15 @@ public class OkHttpClientConfig {
 
     @Bean
     public OkHttpClient getOkHttpClient() {
+        LogInterceptor interceptor = new LogInterceptor();
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .readTimeout(5, TimeUnit.SECONDS).build();
+                .readTimeout(5, TimeUnit.SECONDS)
+                .addInterceptor(interceptor)
+                .addNetworkInterceptor(interceptor)
+                .build();
         return okHttpClient;
     }
+
 
 }
