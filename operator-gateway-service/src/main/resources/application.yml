@@ -27,7 +27,7 @@ forward-json-template: |
     }
   }
 
-handler-expression: |
+forward-handler-expression: |
   [
     {
       "action": "modify",
@@ -68,5 +68,46 @@ handler-expression: |
       "action": "modify",
       "jsonpath": "$.msg_body.req",
       "value": "#request"
+    }
+  ]
+
+response-json-template: |
+  {
+  	"sender": "",
+  	"receiver": "",
+  	"msgType": "",
+  	"msgSn": "",
+  	"msgBody": {
+  		"status": "",
+  		"ext": ""
+  	}
+  }
+
+response-handler-expression: |
+  [
+    {
+      "action": "modify",
+      "jsonpath": "$.sender",
+      "value": "#sender"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.receiver",
+      "value": "#receiver"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msgType",
+      "value": "#responseMsgType"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msgSn",
+      "value": "#msgSn"
+    },
+    {
+      "action": "modify",
+      "jsonpath": "$.msgBody",
+      "value": "#msgBody"
     }
   ]
