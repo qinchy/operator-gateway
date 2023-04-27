@@ -1,5 +1,6 @@
 package com.qinchy.operatorgatewayservice.config;
 
+import com.zhy.http.okhttp.OkHttpUtils;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ public class OkHttpClientConfig {
                 .addInterceptor(interceptor)
                 .addNetworkInterceptor(interceptor)
                 .build();
+        OkHttpUtils.initClient(okHttpClient);
         return okHttpClient;
     }
 

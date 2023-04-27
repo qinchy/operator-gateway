@@ -7,6 +7,8 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.qinchy.operatorgatewayservice.bean.Response;
 import com.qinchy.operatorgatewayservice.config.OperatorConfig;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -28,8 +30,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("ALL")
@@ -71,7 +75,7 @@ public class ForwardController {
         Map<String, Object> forwardMessage = buildForwardMessage(request);
 
         log.info("开始请求运营商。。。");
-
+        okHttpUtilsPOST();
         // TODO Mock Response Message
         JSONObject operatorResponseMessage = mockResponseMessage();
         log.info("运营商返回：{}", operatorResponseMessage);
@@ -302,5 +306,29 @@ public class ForwardController {
         });
 
         return result[0];
+    }
+
+    private void okHttpUtilsPOST() {
+        Map<String,String> params = new HashMap<>();
+        params.put("key1","value1");
+        params.put("key2","value2");
+
+        OkHttpUtils.post().tag("get")
+                .params(params)
+                .url("https://www.baidu.com")
+                .build()
+                .execute(new StringCallback() {
+
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        log.error("请求出错：{}", id, e);
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        log.error("响应结果：{}", response);
+                    }
+
+                });
     }
 }
