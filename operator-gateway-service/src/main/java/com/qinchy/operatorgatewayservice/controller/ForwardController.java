@@ -8,6 +8,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.qinchy.operatorgatewayservice.bean.Response;
 import com.qinchy.operatorgatewayservice.config.OperatorConfig;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
@@ -33,6 +35,9 @@ public class ForwardController {
 
     @Autowired
     private OperatorConfig operatorConfig;
+
+    @Autowired
+    private OkHttpClient client;
 
     @Value("${forward-json-template}")
     private String forwardJsonTemplate;
@@ -58,7 +63,7 @@ public class ForwardController {
         DocumentContext documentContext = JsonPath.parse(forwardJsonTemplate);
         log.info("转发的JSON文档为：{}", documentContext.jsonString());
         EvaluationContext evaluationContext = getEvaluationContext(request);
-        Map<String,Object> result = buildSendMessage(documentContext, evaluationContext);
+        Map<String, Object> result = buildSendMessage(documentContext, evaluationContext);
 
         // 构造返回对象
         Response.ResponseBuilder<Map<String, Object>> builder = Response.builder();
@@ -138,6 +143,58 @@ public class ForwardController {
             }
         }
 
+        String result1 = doSyncPost("http://localhost:8080/echo", documentContext.jsonString());
+        log.info("OkHttp同步请求结果：{}", result1);
+
+        String result2 = doAsyncPost("http://localhost:8080/echo", documentContext.jsonString());
+        log.info("OkHttp异步请求结果：{}", result2);
+
         return JSON.parseObject(documentContext.jsonString(), Map.class);
+    }
+
+    /**
+     * 同步请求
+     *
+     * @param url  请求地址
+     * @param json 请求json字符串
+     * @return 响应结果
+     * @throws IOException IO异常
+     */
+    String doSyncPost(String url, String json) throws IOException {
+        okhttp3.RequestBody body = okhttp3.RequestBody.create(MediaType.parse("application/json"), json);
+        Request request1 = new Request.Builder().url(url).post(body).build();
+
+        try (okhttp3.Response response = client.newCall(request1).execute()) {
+            return response.body().string();
+        }
+    }
+
+    /**
+     * 异步请求
+     *
+     * @param url  请求地址
+     * @param json 请求json字符串
+     * @return 响应结果
+     */
+    String doAsyncPost(String url, String json) {
+        okhttp3.RequestBody body = okhttp3.RequestBody.create(MediaType.parse("application/json"), json);
+        Request request2 = new Request.Builder().url(url).post(body).build();
+        Call call = client.newCall(request2);
+
+        final String[] result = {""};
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                log.error("请求失败：{}", e);
+            }
+
+            @Override
+            public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                result[0] = response.body().string();
+                log.info("响应结果：{}", result[0]);
+            }
+        });
+
+        return result[0];
     }
 }
